@@ -1,16 +1,19 @@
 import Frame from "../Frame/Frame";
 import { useContext } from "react";
 import { BowlContext } from "../BowlContext/BowlContext";
+import styled from "styled-components";
 
+const FrameWrapper = styled.div`
+	display: flex;
+`;
 const FrameList = () => {
 	const [result] = useContext(BowlContext);
-	console.log(result.outcome);
 	return (
-		<div>
-			{result.map(el => {
-				return <Frame frame={el} />;
+		<FrameWrapper>
+			{result.map((el, index) => {
+				return <Frame frame={el} index={index} key={index} />;
 			})}
-		</div>
+		</FrameWrapper>
 	);
 };
 

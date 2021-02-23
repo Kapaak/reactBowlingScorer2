@@ -1,39 +1,18 @@
-import "./App.css";
 import FrameList from "./FrameList/FrameList";
 import Input from "./Input/Input";
 import { BowlProvider } from "./BowlContext/BowlContext";
+import Wrapper from "./Wrapper/Wrapper";
 
 function App() {
 	return (
-		<div>
-			<p>Bowling scorer</p>
+		<Wrapper>
+			<p className="header">Bowling scorer</p>
 			<BowlProvider>
-				<div className="input">
-					<Input />
-				</div>
 				<FrameList />
+				<Input />
 			</BowlProvider>
-		</div>
+		</Wrapper>
 	);
 }
 
 export default App;
-// function App() {
-// 	const compleateGame = [
-// 		"81",
-// 		"9-",
-// 		"9/",
-// 		"71",
-// 		"9-",
-// 		"X",
-// 		"90",
-// 		"70",
-// 		"x",
-// 		"7-",
-// 	];
-// 	const result = bowl(compleateGame);
-// 	console.log(result);
-// 	return <div className="App"></div>;
-// }
-
-// export default App;
