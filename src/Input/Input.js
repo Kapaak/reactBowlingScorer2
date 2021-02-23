@@ -41,12 +41,16 @@ const Input = () => {
 			currentValue === "x" ||
 			currentValue === "/" ||
 			currentValue === "-";
+
 		if (currentValue.length !== 1) return;
+		else if (counter === 10 && gameProgress[9].charAt(1) !== "/") return;
+		else if (!isLastStrike && counter === 10 && gameProgress[9].length === 2)
+			return;
 		else if (!validChars) return;
 		else if ((currentValue === "x" || currentValue === "X") && turn) return;
 		else if (currentValue === "/" && !turn) return;
 		else if (isLastStrike && gameProgress[9].length === 3)
-			console.log("game-over STRIKE");
+			console.log("game-over");
 		else {
 			if (counter === 9 && (currentValue === "X" || currentValue === "x")) {
 				setIsLastStrike(!isLastStrike);
@@ -56,7 +60,6 @@ const Input = () => {
 			} else if (!turn) firstTurn();
 			else if (turn) secondTurn();
 
-			console.log(updateState);
 			setGameProgress(updateState);
 			inputRef.current.value = "";
 
@@ -64,8 +67,12 @@ const Input = () => {
 
 			function secondTurn() {
 				updateState = [...gameProgress].map((el, index) => {
-					if (index === counter - 1) return (el = el + currentValue);
-					else return el;
+					if (index === counter - 1) {
+						if (parseInt(el) + parseInt(currentValue) >= 10) {
+							return (el = el + "/");
+						}
+						return (el = el + currentValue);
+					} else return el;
 				});
 			}
 			function firstTurn() {
