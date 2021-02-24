@@ -31,7 +31,7 @@ const Input = () => {
 	const [turn, setTurn] = useState(false);
 	const [counter, setCounter] = useState(0);
 	const inputRef = useRef(null);
-	const [isLastStrike, setIsLastStrike] = useState(false);
+	const [hasBonus, setHasBonus] = useState(false);
 	const [isGameOver, setIsGameOver] = useState(false);
 	const submitHandler = () => {
 		let updateState;
@@ -42,39 +42,44 @@ const Input = () => {
 			currentValue === "x" ||
 			currentValue === "/" ||
 			currentValue === "-";
+
 		if (currentValue.length !== 1) return;
-		else if (!isLastStrike && counter === 10 && gameProgress[9].length === 2)
-			setIsGameOver(!isGameOver);
 		else if (!validChars) return;
 		else if ((currentValue === "x" || currentValue === "X") && turn) return;
 		else if (currentValue === "/" && !turn) return;
-		else if (isLastStrike && gameProgress[9].length === 3) {
-			setIsGameOver(true);
-		} else {
+		else {
 			if (
 				counter === 10 &&
 				(currentValue === "/" ||
 					parseInt(gameProgress[counter - 1]) + parseInt(currentValue) === 10)
 			) {
-				setIsLastStrike(true);
+				setHasBonus(true);
 				secondTurn();
 			}
 			if (counter === 9 && (currentValue === "X" || currentValue === "x")) {
-				setIsLastStrike(true);
+				setHasBonus(true);
 				firstTurn();
-			} else if (isLastStrike) {
+			} else if (hasBonus) {
 				secondTurn();
 			} else if (!turn) firstTurn();
 			else if (turn) secondTurn();
 
 			if (!isGameOver) {
+				if (hasBonus && counter === 10 && gameProgress[9].length === 2)
+					setIsGameOver(true);
+				else if (
+					parseInt(gameProgress[counter - 1]) + parseInt(currentValue) < 10 &&
+					counter === 10
+				)
+					setIsGameOver(true);
+
 				if (!currentValue) return;
 				setGameProgress(updateState);
 				inputRef.current.value = "";
-				if (!isLastStrike) setTurn(!turn);
+				if (!hasBonus) setTurn(!turn);
 
 				if (currentValue === "x" || currentValue === "X") {
-					if (!isLastStrike) setTurn(false);
+					if (!hasBonus) setTurn(false);
 				}
 			}
 		}
@@ -99,7 +104,7 @@ const Input = () => {
 	const reset = () => {
 		setTurn(false);
 		setCounter(0);
-		setIsLastStrike(false);
+		setHasBonus(false);
 		setGameProgress([]);
 		setIsGameOver(false);
 	};
