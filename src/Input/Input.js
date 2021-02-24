@@ -32,59 +32,76 @@ const Input = () => {
 	const [counter, setCounter] = useState(0);
 	const inputRef = useRef(null);
 	const [isLastStrike, setIsLastStrike] = useState(false);
+	const [isGameOver, setIsGameOver] = useState(false);
 	const submitHandler = () => {
 		let updateState;
-		const currentValue = inputRef.current.value;
+		let currentValue = inputRef.current.value;
 		const validChars =
 			Number.isInteger(+currentValue) ||
 			currentValue === "X" ||
 			currentValue === "x" ||
 			currentValue === "/" ||
 			currentValue === "-";
-
 		if (currentValue.length !== 1) return;
-		else if (counter === 10 && gameProgress[9].charAt(1) !== "/") return;
 		else if (!isLastStrike && counter === 10 && gameProgress[9].length === 2)
-			return;
+			setIsGameOver(!isGameOver);
 		else if (!validChars) return;
 		else if ((currentValue === "x" || currentValue === "X") && turn) return;
 		else if (currentValue === "/" && !turn) return;
-		else if (isLastStrike && gameProgress[9].length === 3)
-			console.log("game-over");
-		else {
+		else if (isLastStrike && gameProgress[9].length === 3) {
+			setIsGameOver(true);
+		} else {
+			if (
+				counter === 10 &&
+				(currentValue === "/" ||
+					parseInt(gameProgress[counter - 1]) + parseInt(currentValue) === 10)
+			) {
+				setIsLastStrike(true);
+				secondTurn();
+			}
 			if (counter === 9 && (currentValue === "X" || currentValue === "x")) {
-				setIsLastStrike(!isLastStrike);
+				setIsLastStrike(true);
 				firstTurn();
 			} else if (isLastStrike) {
 				secondTurn();
 			} else if (!turn) firstTurn();
 			else if (turn) secondTurn();
 
-			setGameProgress(updateState);
-			inputRef.current.value = "";
+			if (!isGameOver) {
+				if (!currentValue) return;
+				setGameProgress(updateState);
+				inputRef.current.value = "";
+				if (!isLastStrike) setTurn(!turn);
 
-			if (!isLastStrike) setTurn(!turn);
-
-			function secondTurn() {
-				updateState = [...gameProgress].map((el, index) => {
-					if (index === counter - 1) {
-						if (parseInt(el) + parseInt(currentValue) >= 10) {
-							return (el = el + "/");
-						}
-						return (el = el + currentValue);
-					} else return el;
-				});
-			}
-			function firstTurn() {
-				if (isLastStrike) console.log("pp");
-				updateState = [...gameProgress, currentValue];
-				setCounter(prev => prev + 1);
-			}
-
-			if (currentValue === "x" || currentValue === "X") {
-				if (!isLastStrike) setTurn(false);
+				if (currentValue === "x" || currentValue === "X") {
+					if (!isLastStrike) setTurn(false);
+				}
 			}
 		}
+		function secondTurn() {
+			updateState = [...gameProgress].map((el, index) => {
+				if (index === counter - 1) {
+					if (parseInt(el) + parseInt(currentValue) > 10) {
+						return (currentValue = false);
+					}
+					if (parseInt(el) + parseInt(currentValue) === 10) {
+						return (el = el + "/");
+					}
+					return (el = el + currentValue);
+				} else return el;
+			});
+		}
+		function firstTurn() {
+			updateState = [...gameProgress, currentValue];
+			setCounter(prev => prev + 1);
+		}
+	};
+	const reset = () => {
+		setTurn(false);
+		setCounter(0);
+		setIsLastStrike(false);
+		setGameProgress([]);
+		setIsGameOver(false);
 	};
 	return (
 		<>
@@ -99,6 +116,9 @@ const Input = () => {
 					}
 				/>
 				<StyledButton onClick={submitHandler}>submit</StyledButton>
+				{isGameOver ? (
+					<StyledButton onClick={reset}>restart</StyledButton>
+				) : null}
 			</div>
 			<Underline>
 				strike: <span>x</span>spare: <span>/</span>zero: <span>-</span>
