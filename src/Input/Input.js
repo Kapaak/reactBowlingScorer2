@@ -89,7 +89,11 @@ const Input = () => {
 					if (parseInt(el) + parseInt(currentValue) > 10) {
 						return (currentValue = false);
 					}
-					if (parseInt(el) + parseInt(currentValue) === 10) {
+					if (
+						parseInt(el) + parseInt(currentValue) === 10 &&
+						gameProgress[9]?.length !== 2
+					) {
+						console.log("bar");
 						return (el = el + "/");
 					}
 					return (el = el + currentValue);
